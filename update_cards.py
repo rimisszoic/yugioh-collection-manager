@@ -1,4 +1,4 @@
-import requests
+deimport requests
 import mysql.connector
 from mysql.connector import errorcode
 
@@ -62,4 +62,3 @@ def connect_db():
 
                                                                                                                                                                                                                                                                                                                 if __name__ == "__main__":
                                                                                                                                                                                                                                                                                                                     update_card_database()
-                                                                                                                                                                                                                                                                                                                    

@@ -5,6 +5,7 @@ import requests
 import mysql.connector
 import logging
 from config_logging import setup_logging
+from update_cards import update_card_database
 
 # Configurar logging
 setup_logging()

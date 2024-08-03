@@ -36,3 +36,9 @@ CREATE TABLE rarities (
     score INT NOT NULL,
     name VARCHAR(255) NOT NULL
 );
+
+ALTER TABLE cards ADD COLUMN rarity_id INT;
+
+-- Crear un índice único para evitar duplicados en 'cards'
+ALTER TABLE cards
+ADD UNIQUE KEY unique_card (name, archetype, type, rarity_id);

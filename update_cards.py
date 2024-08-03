@@ -45,7 +45,28 @@ def update_rarities(cursor, rarities):
         logging.error(f"Error al actualizar rarezas: {err}")
         raise
 
-# Actualizar la base de datos con los datos de las cartas
+# Actualizar o insertar cartas
+def upsert_cards(cursor, cards, rarity_dict):
+    add_card = (
+        "INSERT INTO cards (name, archetype, type, description, quantity, rarity_id, price) "
+        "VALUES (%s, %s, %s, %s, %s, %s, %s) "
+        "ON DUPLICATE KEY UPDATE archetype = VALUES(archetype), type = VALUES(type), "
+        "description = VALUES(description), quantity = VALUES(quantity), rarity_id = VALUES(rarity_id), "
+        "price = VALUES(price)"
+    )
+
+    for card in cards:
+        card_data = (
+            card.get('name', ''),
+            card.get('archetype', ''),
+            card.get('type', ''),
+            card.get('desc', ''),
+            0,  # Cantidad por defecto
+            rarity_dict.get(card.get('rarity', ''), None),
+            card.get('card_prices', [{}])[0].get('cardmarket_price', 0.0)
+        )
+        cursor.execute(add_card, card_data)
+
 def update_card_database():
     logging.info("Iniciando actualización de la base de datos de cartas.")
     try:
@@ -75,22 +96,8 @@ def update_card_database():
         rarities = {card.get('rarity', '') for card in cards if card.get('rarity', '')}
         rarity_dict = update_rarities(cursor, rarities)
 
-        add_card = ("INSERT INTO cards "
-                    "(name, archetype, type, description, quantity, rarity, price) "
-                    "VALUES (%s, %s, %s, %s, %s, %s, %s)")
-
-        for card in cards:
-            card_data = (
-                card.get('name', ''),
-                card.get('archetype', ''),
-                card.get('type', ''),
-                card.get('desc', ''),
-                0,  # Cantidad por defecto
-                rarity_dict.get(card.get('rarity', ''), None),
-                card.get('card_prices', [{}])[0].get('cardmarket_price', 0.0)
-            )
-            cursor.execute(add_card, card_data)
-            connection.commit()
+        upsert_cards(cursor, cards, rarity_dict)
+        connection.commit()
 
         logging.info("Actualización de la base de datos de cartas completada.")
     except mysql.connector.Error as err:

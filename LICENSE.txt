@@ -1,0 +1,31 @@
+Licencia Exclusiva de Noel Pérez Villanueva
+
+Copyright (c) 2024 Noel Pérez Villanueva
+
+Se concede permiso, sin costo alguno, a cualquier persona que obtenga una copia del software y de la documentación asociada (el "Software"), para usar el Software bajo las siguientes condiciones:
+
+1. **Distribución Exclusiva**: 
+   - Solo Noel Pérez Villanueva tiene el derecho de vender, distribuir o sublicenciar el Software. Cualquier intento de distribución o venta por parte de terceros está estrictamente prohibido.
+
+2. **Uso de Terceros**: 
+   - El Software puede utilizar contenido y servicios de terceros (como Yu-Gi-Oh!) y APIs proporcionadas por otros proveedores. Los usuarios deben cumplir con los términos y condiciones de estos terceros.
+
+3. **No Libre Distribución**:
+   - Este Software no se encuentra bajo ninguna licencia de distribución libre ni Creative Commons (CC). No está permitido distribuir el Software libremente, ni modificarlo y redistribuirlo sin el permiso expreso de Noel Pérez Villanueva.
+
+4. **Incluir Avisos**:
+   - El aviso de derechos de autor anterior y este aviso de permiso deben incluirse en todas las copias o partes sustanciales del Software.
+
+5. **Garantías y Responsabilidad**:
+   - EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, YA SEA EXPRESA O IMPLÍCITA, INCLUYENDO, PERO NO LIMITADO A, GARANTÍAS IMPLÍCITAS DE COMERCIABILIDAD, APTITUD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO EL AUTOR O TITULAR DE LOS DERECHOS DE AUTOR SERÁ RESPONSABLE DE CUALQUIER RECLAMO, DAÑO O OTRA RESPONSABILIDAD QUE SURJA DEL SOFTWARE O SU USO.
+
+6. **Derechos sobre el Software**:
+   - Todos los derechos sobre el Software y sus modificaciones pertenecen exclusivamente a Noel Pérez Villanueva. El Software no puede ser usado para fines comerciales por terceros sin el permiso explícito de Noel Pérez Villanueva.
+
+7. **Soporte**:
+   - Ofrezco soporte para el Software, pero no asumo ninguna obligación adicional fuera de lo expresamente mencionado. Para soporte, contacta a soporte@noeldev.live.
+
+8. **Exención de Responsabilidad por Modificaciones No Autorizadas**:
+   - Noel Pérez Villanueva no se hace responsable de ningún daño, pérdida o perjuicio que pueda resultar del uso de versiones del Software que hayan sido modificadas sin autorización. En particular, no se asume responsabilidad alguna por la infección del Software por malware, virus, o cualquier otro tipo de software dañino derivado de modificaciones no autorizadas. El usuario es el único responsable de asegurar la integridad del Software y de tomar medidas para protegerse contra software malicioso.
+
+Noel Pérez Villanueva

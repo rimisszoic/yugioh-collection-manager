@@ -1,8 +1,42 @@
-# Ignore log files and directories
-logs/
-*.log
-app.log
+# Directorios generados por PyInstaller
+build/
+dist/
+compile/
 
-# Ignore Python bytecode files
+# Archivos de caché y compilación de Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Archivos de logs
+logs/
+*.log
+
+# Archivos de configuración del IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de entorno virtual
+venv/
+env/
+
+# Archivos de paquetes
+*.egg
+*.egg-info
+
+# Archivos generados por herramientas de empaquetado
+*.spec
+
+# Configuración de PyInstaller
+*.spec
+
+# Archivos temporales
+*.tmp
+*.bak
+
+# Otros archivos que no deseas incluir
+*.DS_Store
+*.Thumbs.db

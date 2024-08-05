@@ -89,12 +89,15 @@ def update_card_database():
         logging.error("La estructura de datos no es la esperada.")
         return
 
+    rarities = {card.get('rarity', '') for card in cards if card.get('rarity', '')}
+    logging.debug(f"Rarezas encontradas: {rarities}")
+
     try:
         connection = connect_db()
         cursor = connection.cursor()
 
-        rarities = {card.get('rarity', '') for card in cards if card.get('rarity', '')}
         rarity_dict = update_rarities(cursor, rarities)
+        logging.debug(f"Diccionario de rarezas: {rarity_dict}")
 
         upsert_cards(cursor, cards, rarity_dict)
         connection.commit()

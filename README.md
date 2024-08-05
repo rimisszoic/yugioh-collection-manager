@@ -11,7 +11,6 @@
   - [Uso](#uso)
     - [Interfaz de Usuario](#interfaz-de-usuario)
   - [Documentación Adicional](#documentación-adicional)
-  - [Contribuir](#contribuir)
   - [Licencia](#licencia)
 
 ## Características
@@ -59,26 +58,16 @@ La interfaz de **YugiCollectionApp** incluye los siguientes elementos:
   - **Añadir Cantidad:** Modifica la cantidad de una carta en tu colección.
   - **Actualizar DB:** Actualiza la base de datos con la información más reciente.
 
-Para más detalles sobre cómo utilizar la aplicación, consulta la [Guía del Usuario](./guia_usuario.md).
+Para más detalles sobre cómo utilizar la aplicación, consulta la [Guía del Usuario](https://github.com/rimissgames/yugioh-collection-manager/wiki/guia_usuario.md).
 
 ## Documentación Adicional
 
 - **[Wiki del Proyecto](https://github.com/rimissgames/yugioh-collection-manager/wiki):** Consulta la wiki para obtener información adicional, incluyendo guías detalladas y notas de la versión.
-- **[Preguntas Frecuentes](./faq.md):** Revisa las preguntas frecuentes para obtener respuestas a dudas comunes.
-
-## Contribuir
-
-Si deseas contribuir a **YugiCollectionApp**, por favor sigue estos pasos:
-
-1. **Haz un Fork del Repositorio:** Crea tu propia copia del repositorio en GitHub.
-2. **Crea una Rama:** Trabaja en tu cambio en una rama separada.
-3. **Haz un Pull Request:** Envía una solicitud de extracción con tus cambios para revisión.
-
-Consulta el archivo [CONTRIBUTING.md](./CONTRIBUTING.md) para obtener más detalles sobre cómo contribuir.
+- **[Preguntas Frecuentes](https://github.com/rimissgames/yugioh-collection-manager/wiki/faq.md):** Revisa las preguntas frecuentes para obtener respuestas a dudas comunes.
 
 ## Licencia
 
-**YugiCollectionApp** está licenciado bajo la [Licencia MIT](LICENSE). Consulta el archivo `LICENSE` para más detalles.
+**YugiCollectionApp** está licenciado bajo la [Licencia MIT](LICENSE.txt). Consulta el archivo `LICENSE` para más detalles.
 
 ---
 

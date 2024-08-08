@@ -40,3 +40,4 @@ env/
 # Otros archivos que no deseas incluir
 *.DS_Store
 *.Thumbs.db
+setup.iss

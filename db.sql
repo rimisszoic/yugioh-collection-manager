@@ -1,35 +1,44 @@
-CREATE TABLE rarities (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) UNIQUE,
-    score INT DEFAULT 0
-);
+DROP DATABASE IF EXISTS yugicollectionapp;
+
+CREATE DATABASE yugicollectionapp;
+
+USE yugicollectionapp;
 
 CREATE TABLE cards (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
     archetype VARCHAR(255),
     type VARCHAR(255),
-    description TEXT
+    `desc` TEXT,  -- Usar comillas invertidas para evitar conflicto con la palabra reservada
+    quantity INT DEFAULT 0,
+    rarity VARCHAR(255),
+    price DECIMAL(10, 2)
 );
 
-CREATE TABLE card_sets (
+DROP USER IF EXISTS 'yUg1C0ll3ct10n'@'localhost';
+
+CREATE USER 'yUg1C0ll3ct10n'@'localhost' IDENTIFIED BY '%2If3jH$4HvotW&GlD';
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON yugicollectionapp.* TO 'yUg1C0ll3ct10n'@'localhost';
+
+GRANT CREATE ROUTINE, ALTER ROUTINE, EXECUTE ON yugiohcollectionapp.* TO 'yUg1C0ll3ct10n'@'localhost';
+
+-- Otorga los permisos necesarios al usuario 'yUg1C0ll3ct10n'
+GRANT ALL PRIVILEGES ON *.* TO 'yUg1C0ll3ct10n'@'localhost' WITH GRANT OPTION;
+
+-- Aplica los cambios
+FLUSH PRIVILEGES;
+
+ALTER TABLE cards CHANGE `desc` description TEXT;
+
+CREATE TABLE rarities (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    card_id INT,
-    set_name VARCHAR(255),
-    set_code VARCHAR(255),
-    rarity_id INT,
-    set_price DECIMAL(10, 2),
-    FOREIGN KEY (card_id) REFERENCES cards(id),
-    FOREIGN KEY (rarity_id) REFERENCES rarities(id)
+    score INT NOT NULL,
+    name VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE card_prices (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    card_id INT,
-    cardmarket_price DECIMAL(10, 2),
-    tcgplayer_price DECIMAL(10, 2),
-    ebay_price DECIMAL(10, 2),
-    amazon_price DECIMAL(10, 2),
-    coolstuffinc_price DECIMAL(10, 2),
-    FOREIGN KEY (card_id) REFERENCES cards(id)
-);
+ALTER TABLE cards ADD COLUMN rarity_id INT;
+
+-- Crear un índice único para evitar duplicados en 'cards'
+ALTER TABLE cards
+ADD UNIQUE KEY unique_card (name, archetype, type, rarity_id);

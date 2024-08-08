@@ -40,9 +40,13 @@ env/
 # Otros archivos que no deseas incluir
 *.DS_Store
 *.Thumbs.db
+<<<<<<< HEAD
 
 # Carpeta de recursos
 resources/
 
 # installer
 *.iss
+=======
+setup.iss
+>>>>>>> d180ed32ac4a1f3cd6a0900bd29c90d4a16e2497

@@ -1,8 +1,11 @@
 import tkinter as tk
 from tkinter import simpledialog, messagebox, ttk
 from concurrent.futures import ThreadPoolExecutor
+from PIL import Image, ImageTk
 import mysql.connector
 import logging
+import requests
+from io import BytesIO
 from config_logging import setup_logging
 from update_cards import update_card_database
 
@@ -53,31 +56,36 @@ def get_card_info(card_name):
     card_info = None
     
     try:
-        # Establecer conexión a la base de datos
         connection = connect_db()
-        cursor = connection.cursor(dictionary=True)  # Usa el formato de diccionario para obtener nombres de columna como claves
-        
-        # Ejecutar la consulta
+        cursor = connection.cursor(dictionary=True)
         query = "SELECT * FROM cards WHERE name = %s"
         cursor.execute(query, (card_name,))
-        
-        # Obtener un único resultado
         card_info = cursor.fetchone()
         while cursor.nextset():
             pass
         
     except mysql.connector.Error as err:
-        #print(f"Error: {err}")
         logging.error(f"Error al obtener información de la carta: {err}")
         card_info = None
     finally:
-        # Cerrar el cursor y la conexión si están abiertos
         if cursor:
             cursor.close()
         if connection:
             connection.close()
     
     return card_info
+
+def fetch_image(card_name, callback):
+    """Descarga la imagen de una carta y la pasa a través del callback."""
+    try:
+        # URL de ejemplo, reemplázala con la URL real de la API o la fuente de imágenes
+        url = f"https://api.example.com/cards/{card_name}/image"
+        response = requests.get(url)
+        image_data = response.content
+        image = Image.open(BytesIO(image_data))
+        callback(image)
+    except Exception as e:
+        logging.error(f"Error al descargar la imagen: {e}")
 
 def update_cards():
     """Actualiza la base de datos de cartas en un hilo separado."""
@@ -117,28 +125,8 @@ def filter_cards():
         logging.error(f"Error al filtrar cartas: {err}")
         messagebox.showerror("Error", f"Error al filtrar cartas: {err}")
 
-def add_card_quantity():
-    """Añade una cantidad especificada a la carta seleccionada."""
-    selected_item = tree.selection()
-    if not selected_item:
-        messagebox.showwarning("Advertencia", "Por favor, seleccione una carta.")
-        return
-
-    item = tree.item(selected_item)
-    card_name = item['values'][0]
-
-    quantity = simpledialog.askinteger("Añadir Cantidad", f"Cantidad para añadir a '{card_name}':")
-    if quantity is None:
-        return
-
-    def task():
-        update_card_quantity(card_name, quantity)
-        filter_cards()  # Refresh the list
-
-    executor.submit(task)
-
 def show_card_info():
-    """Muestra la información de la carta seleccionada."""
+    """Muestra la información de la carta seleccionada en una nueva ventana."""
     selected_item = tree.selection()
     if not selected_item:
         messagebox.showwarning("Advertencia", "No se ha seleccionado ninguna carta.")
@@ -147,23 +135,54 @@ def show_card_info():
     item = tree.item(selected_item[0])
     card_name = item['values'][0]
 
-    try:
-        card_info = get_card_info(card_name)
-        if card_info:
-            info = (f"Nombre: {card_info.get('name', 'Desconocido')}\n"
-                    f"Arquetipo: {card_info.get('archetype', 'Desconocido')}\n"
-                    f"Tipo: {card_info.get('type', 'Desconocido')}\n"
-                    f"Descripción: {card_info.get('description', 'Desconocida')}\n"
-                    f"Rareza: {card_info.get('rarity_name', 'Desconocida')}\n"
-                    f"Precio: {card_info.get('price', 'Desconocido')}\n"
-                    f"Cantidad: {card_info.get('quantity', 'Desconocida')}")
-            result_text.delete(1.0, tk.END)
-            result_text.insert(tk.END, info)
-        else:
-            messagebox.showerror("Error", "No se pudo obtener la información de la carta.")
-    except Exception as e:
-        print(f"Error al mostrar la información de la carta: {e}")
-        messagebox.showerror("Error", f"Se produjo un error: {e}")
+    card_info = get_card_info(card_name)
+    
+    def on_image_fetched(image):
+        # Convertir la imagen a un formato que pueda mostrar Tkinter
+        photo = ImageTk.PhotoImage(image)
+        img_label.config(image=photo)
+        img_label.image = photo
+    
+    # Crear la ventana de información de la carta
+    info_window = tk.Toplevel(root)
+    info_window.title(f"Información de {card_name}")
+    info_window.geometry("400x600")
+
+    # Mostrar la imagen
+    img_label = tk.Label(info_window)
+    img_label.pack(pady=10)
+
+    # Obtener y mostrar la información de la carta
+    if card_info:
+        info_text = (f"Nombre: {card_info.get('name', 'Desconocido')}\n"
+                     f"Arquetipo: {card_info.get('archetype', 'Desconocido')}\n"
+                     f"Tipo: {card_info.get('type', 'Desconocido')}\n"
+                     f"Descripción: {card_info.get('description', 'Desconocida')}\n"
+                     f"Rareza: {card_info.get('rarity', 'Desconocida')}\n"
+                     f"Precio: {card_info.get('price', 'Desconocido')}\n"
+                     f"Cantidad: {card_info.get('quantity', 'Desconocida')}")
+        
+        info_label = tk.Label(info_window, text=info_text, justify=tk.LEFT)
+        info_label.pack(pady=10)
+
+        # Campo para añadir cantidad
+        def add_quantity():
+            try:
+                quantity = int(quantity_entry.get())
+                update_card_quantity(card_name, quantity)
+                filter_cards()  # Refresh the list
+                info_window.destroy()
+            except ValueError:
+                messagebox.showerror("Error", "Cantidad inválida. Debe ser un número entero.")
+
+        tk.Label(info_window, text=f"Añadir cantidad a '{card_name}':").pack(pady=10)
+        quantity_entry = tk.Entry(info_window)
+        quantity_entry.pack(pady=5)
+        tk.Button(info_window, text="Añadir", command=add_quantity).pack(pady=10)
+        tk.Button(info_window, text="Cancelar", command=info_window.destroy).pack(pady=5)
+
+    # Descargar la imagen en un hilo separado
+    executor.submit(fetch_image, card_name, on_image_fetched)
 
 def alert_high_quantity_cards():
     """Muestra una alerta con las cartas que tienen alta cantidad."""
@@ -184,7 +203,6 @@ def alert_high_quantity_cards():
         logging.error(f"Error al obtener cartas con alta cantidad: {err}")
         messagebox.showerror("Error", f"Error al obtener cartas con alta cantidad: {err}")
 
-# Función para obtener los arquetipos de la base de datos
 def get_archetypes():
     """Obtiene la lista de arquetipos únicos de la base de datos."""
     connection = None
@@ -192,20 +210,16 @@ def get_archetypes():
     archetypes = []
 
     try:
-        # Configura la conexión a la base de datos (ajusta según tu configuración)
         connection = connect_db()
         cursor = connection.cursor()
-
-        # Ejecuta la consulta para obtener los arquetipos únicos
         query = "SELECT DISTINCT archetype FROM cards"
         cursor.execute(query)
         archetypes = [row[0] for row in cursor.fetchall()]
 
     except mysql.connector.Error as err:
-        print(f"Error en la base de datos: {err}")
+        logging.error(f"Error en la base de datos: {err}")
 
     finally:
-        # Cierra el cursor y la conexión
         if cursor:
             cursor.close()
         if connection:
@@ -213,7 +227,6 @@ def get_archetypes():
 
     return archetypes
 
-# Función para filtrar por arquetipo
 def filter_by_archetype():
     """Filtra la lista de cartas por el arquetipo seleccionado en el dropdown."""
     selected_archetype = archetype_var.get()
@@ -221,11 +234,9 @@ def filter_by_archetype():
         messagebox.showwarning("Advertencia", "Por favor, selecciona un arquetipo.")
         return
 
-    # Limpia la vista actual
     for row in tree.get_children():
         tree.delete(row)
 
-    # Obtén las cartas filtradas por el arquetipo seleccionado
     connection = None
     cursor = None
     try:
@@ -235,12 +246,11 @@ def filter_by_archetype():
         cursor.execute(query, (selected_archetype,))
         cards = cursor.fetchall()
 
-        # Inserta las cartas filtradas en el Treeview
         for card in cards:
             tree.insert('', tk.END, values=(card['name'], card['archetype'], card['type'], card['description'], card['rarity'], card['price'], card['quantity']))
 
     except mysql.connector.Error as err:
-        print(f"Error en la base de datos: {err}")
+        logging.error(f"Error en la base de datos: {err}")
         messagebox.showerror("Error", "No se pudo filtrar las cartas.")
     
     finally:
@@ -253,7 +263,6 @@ def filter_by_archetype():
 root = tk.Tk()
 root.title("YugiCollectionApp")
 
-# Configurar el marco de búsqueda
 search_frame = tk.Frame(root)
 search_frame.pack(fill=tk.X, pady=10)
 
@@ -265,7 +274,6 @@ search_label.pack(side=tk.LEFT, padx=5)
 search_entry = tk.Entry(search_frame, textvariable=search_var, width=30)
 search_entry.pack(side=tk.LEFT, padx=5, fill=tk.X, expand=True)
 
-# Función para manejar la búsqueda cuando se presiona Enter
 def on_enter(event):
     filter_cards()
 
@@ -274,24 +282,20 @@ search_entry.bind("<Return>", on_enter)
 search_button = tk.Button(search_frame, text="Buscar", command=filter_cards)
 search_button.pack(side=tk.LEFT, padx=5)
 
-# Crear el menú de filtros
 filter_label = tk.Label(search_frame, text="Filtrar por:")
 filter_label.pack(side=tk.LEFT, padx=5)
 filter_options = ["name", "archetype", "type", "description", "rarity", "price"]
 filter_menu = tk.OptionMenu(search_frame, filter_var, *filter_options)
 filter_menu.pack(side=tk.LEFT, padx=5)
 
-# Crear el dropdown de arquetipos
 archetypes = get_archetypes()
 archetype_var = tk.StringVar(value="")
 archetype_menu = ttk.Combobox(search_frame, textvariable=archetype_var, values=archetypes)
 archetype_menu.pack(side=tk.LEFT, padx=5)
 
-# Crear el marco de resultados
 result_frame = tk.Frame(root)
 result_frame.pack(fill=tk.BOTH, expand=True, pady=10)
 
-# Crear el Treeview
 columns = ("name", "archetype", "type", "description", "rarity", "price", "quantity")
 tree = ttk.Treeview(result_frame, columns=columns, show='headings')
 tree.pack(fill=tk.BOTH, expand=True)
@@ -300,12 +304,10 @@ for col in columns:
     tree.heading(col, text=col.capitalize())
     tree.column(col, width=100)
 
-# Configurar el marco de botones adicionales
 button_frame = tk.Frame(root)
 button_frame.pack(fill=tk.X, pady=10)
 
-# Crear botones
-add_quantity_button = tk.Button(button_frame, text="Añadir Cantidad", command=add_card_quantity)
+add_quantity_button = tk.Button(button_frame, text="Añadir Cantidad", command=lambda: show_card_info())
 add_quantity_button.pack(side=tk.LEFT, padx=5)
 
 show_info_button = tk.Button(button_frame, text="Mostrar Info", command=show_card_info)
@@ -317,19 +319,15 @@ high_quantity_button.pack(side=tk.LEFT, padx=5)
 update_db_button = tk.Button(button_frame, text="Actualizar DB", command=update_cards)
 update_db_button.pack(side=tk.LEFT, padx=5)
 
-# Crear botón para filtrar por arquetipo
 filter_archetype_button = tk.Button(button_frame, text="Filtrar por Arquetipo", command=filter_by_archetype)
 filter_archetype_button.pack(side=tk.LEFT, padx=5)
 
-# Crear el marco de información de la carta
 info_frame = tk.Frame(root)
 info_frame.pack(fill=tk.X, pady=10)
 
-# Crear el widget de texto para resultados
 result_text = tk.Text(info_frame, height=5, width=60)
 result_text.pack(fill=tk.BOTH, expand=True, pady=10)
 
-# Agregar un binding para el Treeview
 tree.bind("<<TreeviewSelect>>", lambda event: show_card_info())
 
 # Ejecutar la aplicación

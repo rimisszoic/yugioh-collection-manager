@@ -74,16 +74,17 @@ def install_mysql():
     mysql_installer_url = "https://dev.mysql.com/get/Downloads/MySQLInstaller/mysql-installer-web-community-8.0.26.0.msi"
     installer_path = os.path.join(os.getcwd(), "mysql-installer.msi")
 
-    subprocess.run(["curl", "-L", "-o", installer_path, mysql_installer_url])
-    subprocess.run(["msiexec", "/i", installer_path, "/quiet", "/norestart", "ADDLOCAL=ALL", "REMOVE=ConnectorODBC,ConnectorJ"])
-    subprocess.run(["mysqladmin", "-u", "root", "password", "toor"])
+    subprocess.run(["curl", "-L", "-o", installer_path, mysql_installer_url], check=True)
+    subprocess.run(["msiexec", "/i", installer_path, "/quiet", "/norestart", "ADDLOCAL=ALL", "REMOVE=ConnectorODBC,ConnectorJ"], check=True)
+    # Set root password using mysqladmin
+    subprocess.run(["mysqladmin", "-u", "root", "password", "toor"], check=True)
 
 if not workbench_installed:
     install_mysql()
 
 def run_db_script():
     db_script_path = os.path.join(os.getcwd(), "db.sql")
-    subprocess.run(["mysql", "-u", "root", "-ptoor", "-e", f"source {db_script_path}"])
+    subprocess.run(["mysql", "-u", "root", "-ptoor", "-e", f"source {db_script_path}"], check=True)
 
 run_db_script()
 

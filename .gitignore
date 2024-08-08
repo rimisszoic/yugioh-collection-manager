@@ -30,9 +30,6 @@ env/
 # Archivos generados por herramientas de empaquetado
 *.spec
 
-# Configuración de PyInstaller
-*.spec
-
 # Archivos temporales
 *.tmp
 *.bak
@@ -41,9 +38,10 @@ env/
 *.DS_Store
 *.Thumbs.db
 
-# Carpeta de recursos
+# Carpeta de recursos (si solo se desea ignorar ciertos archivos dentro de resources/)
+# Descomentar la siguiente línea si deseas ignorar todo en resources/
 resources/
 
-# installer
+# Archivos de instalación
 *.iss
 setup.iss
